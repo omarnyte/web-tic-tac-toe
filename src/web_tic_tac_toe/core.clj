@@ -1,33 +1,34 @@
 (ns web-tic-tac-toe.core
-  (:require [web-tic-tac-toe.default-handler])
+  (:require [web-tic-tac-toe.default-handler :as default-handler]
+            [web-tic-tac-toe.middleware :as middleware])
   (:gen-class))
 
-; (import Router Middleware Server)
+(import Directory Router Server)
 
-; (defn get-default-handler
-;   []
-;   default-handler)
+(def default-port 8888)
+(def path (System/getProperty "user.dir"))
 
-; (defn get-routes
-;   []
-;   (doto (new java.util.HashMap)))
+(defn get-routes
+  []
+  (doto (new java.util.HashMap)))
 
-; (defn get-directory
-;   []
-;   (doto (new java.util.HashMap)))
+(defn get-directory
+  []
+  (Directory. path))
 
-; (defn setUpRouter 
-;   []
-;   (Router. (get-default-handler) (get-routes) (get-directory)))
+(defn set-up-router 
+  []
+  (Router. (default-handler/reify-handler)
+           (get-routes) 
+           (get-directory)))
 
-; (defn startServer
-;   []
-;   (Server. 5000 (setUpRouter) (setUpMiddlewareChain))))
-
-; (defn -main
-;   []
-;   startServer)
+(defn configure-server
+  []
+  (Server. default-port 
+           (set-up-router) 
+           (middleware/extend-middleware)))
 
 (defn -main
   []
-  (println "Hello, web!"))
+  (.. (configure-server)
+      (start)))
