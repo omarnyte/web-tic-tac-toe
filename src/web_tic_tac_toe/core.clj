@@ -6,19 +6,20 @@
 (import Directory Router Server)
 
 (def default-port 8888)
-(def path (System/getProperty "user.dir"))
-
-(defn get-routes
-  []
-  (doto (new java.util.HashMap)))
+(def path (str (System/getProperty "user.dir") "/public"))
 
 (defn get-directory
   []
   (Directory. path))
 
+(defn get-routes
+  []
+  (doto (java.util.HashMap.)
+        (.put "/" (default-handler/reify-handler (get-directory)))))
+
 (defn set-up-router 
   []
-  (Router. (default-handler/reify-handler)
+  (Router. (default-handler/reify-handler (get-directory))
            (get-routes) 
            (get-directory)))
 

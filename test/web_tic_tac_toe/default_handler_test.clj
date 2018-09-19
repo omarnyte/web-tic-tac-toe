@@ -2,21 +2,27 @@
   (:require [clojure.test :refer :all]
             [web-tic-tac-toe.default-handler :refer :all]))
 
-(import Handler HttpStatusCode Request Response)
+(import HttpStatusCode MessageHeader)
 
 (def sample-request
      (.. (Request$Builder.)
          (build)))
 
-(def handler reify-handler)
+(def path (str (System/getProperty "user.dir") "/public"))
+
+(defn get-directory
+  []
+  (Directory. path))
     
 (def response-from-handler
-  (.generateResponse (handler) sample-request))
+  (.generateResponse (reify-handler (get-directory))
+                     sample-request))
 
 (deftest generate-response-test 
   (testing "it builds a Response with status code 200")
     (is (= HttpStatusCode/OK 
            (.getStatusCode response-from-handler)))
-  (testing "it builds a Response with message body 'Hello, world!")
-    (is (= "Hello, world!"
-        (String. (.getMessageBody response-from-handler)))))
+  (testing "it builds a Response with Content-Type text/html")
+    (is (= "text/html"
+           (.getHeader response-from-handler 
+                       MessageHeader/CONTENT_TYPE))))
