@@ -27,7 +27,7 @@
   []
   (Server. default-port 
            (set-up-router) 
-           (middleware/extend-middleware)))
+           (set-up-logger-middleware)))
 
 (defn -main
   []
