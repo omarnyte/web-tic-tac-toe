@@ -1,8 +1,7 @@
 (ns web-tic-tac-toe.new-game-handler
   (:gen-class)
   (:require [cheshire.core :as cheshire]
-            [tic-tac-clojure.board :as board]
-            [tic-tac-clojure.gameplay :as gameplay]))
+            [tic-tac-clojure.board :as board]))
 
 (import Handler Response)
 
@@ -10,16 +9,34 @@
 (def human-v-ai 2)
 (def ai-v-ai 3)
 
-(defn create-message-body
-  []
-  (let [board-length 9]
-    (cheshire/generate-string {:board (board/generate-empty-board board-length)})))
+(defn- set-first-player
+  [gameType]
+  (case gameType
+        "human-v-human" "human"
+        "human-v-ai" "human"))
 
-(defn generate-response
+(defn- set-second-player
+  [gameType]
+  (case gameType
+        "human-v-human" "human"
+        "human-v-ai" "ai"))
+
+(defn- create-message-body
+  [request]
+  (let [board-length 9
+        request-json (cheshire/parse-string (.getBody request))]
+    (cheshire/generate-string {
+      :board (board/generate-empty-board board-length)
+      :currentPlayerMark "X"
+      :X  (set-first-player (get request-json "gameType"))
+      :O  (set-second-player (get request-json "gameType"))
+    })))
+  
+(defn- generate-response
   [request]
   (.. (Response$Builder. HttpStatusCode/OK)
       (setHeader (MessageHeader/CONTENT_TYPE) "application/json")
-      (messageBody (create-message-body))
+      (messageBody (create-message-body request))
       (build)))
 
 (defn reify-handler 

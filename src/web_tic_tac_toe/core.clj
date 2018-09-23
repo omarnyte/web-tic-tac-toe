@@ -1,5 +1,6 @@
 (ns web-tic-tac-toe.core
   (:require [web-tic-tac-toe.default-handler :as default-handler]
+            [web-tic-tac-toe.move-handler :as move-handler]
             [web-tic-tac-toe.new-game-handler :as new-game-handler]
             [web-tic-tac-toe.middleware :as middleware])
   (:gen-class))
@@ -18,7 +19,8 @@
   []
   (doto (java.util.HashMap.)
         (.put "/" (default-handler/reify-handler (get-directory)))
-        (.put "/api/new-game" (new-game-handler/reify-handler))))
+        (.put "/api/new-game" (new-game-handler/reify-handler))
+        (.put "/api/move" (move-handler/reify-handler))))
 
 (defn set-up-router 
   []
