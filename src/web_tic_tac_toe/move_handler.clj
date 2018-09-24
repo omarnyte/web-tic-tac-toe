@@ -27,10 +27,9 @@
     (if is-human (make-human-move request-json) 
                  (make-ai-move request-json))))
 
-(defn create-message-body
+(defn- create-message-body
   [request]
   (let [request-json (cheshire/parse-string (.getBody request))]
-    (println request-json)
     (cheshire/generate-string {
       :board (make-move request-json)
       :currentPlayerMark (get request-json "currentPlayerMark")
@@ -38,7 +37,7 @@
       :O (get request-json "O")
     })))
           
-(defn generate-response
+(defn- generate-response
   [request]
   (.. (Response$Builder. HttpStatusCode/OK)
       (setHeader (MessageHeader/CONTENT_TYPE) "application/json")

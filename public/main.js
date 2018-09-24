@@ -1,57 +1,64 @@
-let board = [null, null, null, null, null, null, null, null, null];
-let currentPlayerMark;
-let X;
-let O;
+const endpoints = {
+  move: "/api/move",
+  newGame: "/api/new-game",
+}
+
+const jsonPostPayload = {
+  method: "POST",
+  headers: {
+    'Content-Type': 'application/json'
+  }
+}
+
+let state = {}
+
+const makeRequest = (url, payload, callback) => {
+  fetch(url, payload)
+    .then(response => response.json()) 
+    .then(data => callback(data));
+}
 
 const newGameRequest = (id) => {
-  const newGameEndpoint = "/api/new-game";
-  const method = "POST";
-  const headers = {
-    'Content-Type': 'application/json'
-  };
-  const body = JSON.stringify({
-    gameType: id
-  });
-  fetch(newGameEndpoint, {
-    method,
-    headers,
-    body
-  }).then(response => response.json()) 
-    .then(data => updateState(data));
+  let payload = jsonPostPayload;
+  payload.body = state;
+  payload.body.gameType = id;
+  payload.body = JSON.stringify(payload.body);
+  makeRequest(endpoints.newGame, payload, updateState);
 }
 
 const moveRequest = (idx) => {
-  const moveRequestEndpoint = "/api/move";
-  const method = "POST";
-  const headers = {
-    'Content-Type': 'application/json'
-  };
-  const body = JSON.stringify({
-    board,
-    currentPlayerMark,
-    O,
-    selectedIdx: idx, 
-    X
-  });
-  fetch(moveRequestEndpoint, {
-    method,
-    headers,
-    body
-  }).then(response => response.json()) 
-    .then(data => updateState(data));
+  let payload = jsonPostPayload;
+  payload.body = state;
+  payload.body.selectedIdx = idx;
+  payload.body = JSON.stringify(payload.body);
+
+  makeRequest(endpoints.move, payload, updateState);
+}
+
+const aiMoveRequest = () => {
+  let payload = jsonPostPayload;
+  payload.body = JSON.stringify(state);
+  makeRequest(endpoints.move, payload, updateState);
+}
+
+const getCurrentPlayerType = (currentPlayerMark) => {
+  return state[currentPlayerMark];
 }
 
 const updateState = (data) => {
   updateBoard(data.board);
-  currentPlayerMark = switchCurrentPlayer(currentPlayerMark);
-  O = data.O;
-  X = data.X;
+  state.currentPlayerMark = switchCurrentPlayer(state.currentPlayerMark);
+  state.O = data.O;
+  state.X = data.X;
+  if (getCurrentPlayerType(state.currentPlayerMark) === "ai") {
+    aiMoveRequest();
+  }
 }
 
 const updateBoard = (updatedBoard) => {
-  board = updatedBoard;
+  state.board = updatedBoard;
   spaces.forEach((space, idx) => {
-    space.innerText = board[idx];
+    space.innerText = state.board[idx];
   });
 }
 
