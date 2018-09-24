@@ -3,6 +3,8 @@ const endpoints = {
   newGame: "/api/new-game",
 }
 
+const markedClassName = "marked";
+
 const jsonPostPayload = {
   method: "POST",
   headers: {
@@ -26,13 +28,18 @@ const newGameRequest = (id) => {
   makeRequest(endpoints.newGame, payload, updateState);
 }
 
-const moveRequest = (idx) => {
+const makeMoveRequest = (idx) => {  
   let payload = jsonPostPayload;
   payload.body = state;
   payload.body.selectedIdx = idx;
   payload.body = JSON.stringify(payload.body);
 
   makeRequest(endpoints.move, payload, updateState);
+}
+
+const handleSpaceClick = (space, idx) => {
+  if (space.classList.contains(markedClassName)) return;
+  makeMoveRequest(idx);
 }
 
 const aiMoveRequest = () => {
@@ -55,10 +62,21 @@ const updateState = (data) => {
   }
 }
 
+const updateClassList = (space, idx) => {
+  updatedClassList = space.classList;
+  if (state.board[idx] != null) updatedClassList.add(markedClassName);
+  return updatedClassList
+}
+
+const updateSpace = (space, idx) => {
+  space.innerText = state.board[idx];
+  space.classList = updateClassList(space, idx);
+}
+
 const updateBoard = (updatedBoard) => {
   state.board = updatedBoard;
   spaces.forEach((space, idx) => {
-    space.innerText = state.board[idx];
+    updateSpace(space, idx);
   });
 }
 
@@ -75,5 +93,5 @@ buttons.forEach(button => {
 const spaces = document.querySelectorAll(".space");
 spaces.forEach(space => {
   const idx = space.dataset.idx;
-  space.addEventListener("click", () => moveRequest(idx));
+  space.addEventListener("click", () => handleSpaceClick(space, idx));
 });
