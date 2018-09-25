@@ -7,6 +7,9 @@
 
 (import Handler Response)
           
+(def oMark "O")
+(def xMark "X")
+
 (defn- make-human-move
   [request-json]
   (board/mark-board (get request-json "board")
@@ -27,14 +30,18 @@
     (if is-human (make-human-move request-json) 
                  (make-ai-move request-json))))
 
+(defn- get-opp-mark
+[marker]
+(if (= xMark marker) oMark xMark))
+
 (defn- create-message-body
   [request]
   (let [request-json (cheshire/parse-string (.getBody request))]
     (cheshire/generate-string {
       :board (make-move request-json)
-      :currentPlayerMark (get request-json "currentPlayerMark")
-      :X (get request-json "X")
-      :O (get request-json "O")
+      :currentPlayerMark (get-opp-mark (get request-json "currentPlayerMark"))
+      :X (get request-json xMark)
+      :O (get request-json oMark)
     })))
           
 (defn- generate-response
