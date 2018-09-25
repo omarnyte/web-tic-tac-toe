@@ -24,6 +24,13 @@
   (.. (Request$Builder.)
       (body (create-message-body gameType))
       (build)))
+
+(deftest generate-response-for-invalid-game-type
+  (let [request (build-request "not-a-valid-game-type")
+        response (.generateResponse new-game-handler request)
+        status-code (.getStatusCode response)]
+      (testing "it returns a Response with status code 400")
+      (is (= 400 status-code))))
                
 (deftest generate-response-for-human-v-human 
   (let [request (build-request "human-v-human")

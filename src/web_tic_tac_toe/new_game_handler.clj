@@ -27,12 +27,23 @@
       :O (set-player game-type oIndex)
     })))
   
-(defn- generate-response
+(defn- build-new-game-response
   [request]
   (.. (Response$Builder. HttpStatusCode/OK)
       (setHeader (MessageHeader/CONTENT_TYPE) "application/json")
       (messageBody (create-message-body request))
       (build)))
+
+(defn- build-bad-request-response
+  []
+  (.. (Response$Builder. HttpStatusCode/BAD_REQUEST)
+      (build)))
+    
+(defn- generate-response
+  [request]
+  (try (build-new-game-response request)
+       (catch NullPointerException e (build-bad-request-response))
+       (catch IndexOutOfBoundsException e (build-bad-request-response))))
 
 (defn reify-handler 
   []

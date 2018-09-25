@@ -7,9 +7,6 @@
 
 (import Handler Response)
           
-(def oMark "O")
-(def xMark "X")
-
 (defn- make-human-move
   [request-json]
   (board/mark-board (get request-json "board")
@@ -32,7 +29,7 @@
 
 (defn- get-opp-mark
 [marker]
-(if (= xMark marker) oMark xMark))
+(if (= "X" marker) "O" "X"))
 
 (defn- create-message-body
   [request]
@@ -40,16 +37,27 @@
     (cheshire/generate-string {
       :board (make-move request-json)
       :currentPlayerMark (get-opp-mark (get request-json "currentPlayerMark"))
-      :X (get request-json xMark)
-      :O (get request-json oMark)
+      :X (get request-json "X")
+      :O (get request-json "O")
     })))
           
-(defn- generate-response
+(defn- build-move-response
   [request]
   (.. (Response$Builder. HttpStatusCode/OK)
       (setHeader (MessageHeader/CONTENT_TYPE) "application/json")
       (messageBody (create-message-body request))
       (build)))
+  
+(defn- build-bad-request-response
+  []
+  (.. (Response$Builder. HttpStatusCode/BAD_REQUEST)
+      (build)))
+        
+(defn- generate-response
+  [request]
+  (try (build-move-response request)
+       (catch NullPointerException e (build-bad-request-response))
+       (catch IndexOutOfBoundsException e (build-bad-request-response))))
 
 (defn reify-handler 
   []

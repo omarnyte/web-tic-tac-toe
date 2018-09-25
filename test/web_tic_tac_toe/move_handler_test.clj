@@ -10,6 +10,14 @@
 (def oMark "O")
 (def xMark "X")
 
+(def invalid-idx-message-body (cheshire/generate-string {
+  :board [nil nil nil nil nil nil nil nil nil]
+  :currentPlayerMark xMark
+  :O human
+  :selectedIdx "100"
+  :X human
+}))
+
 (def human-v-human-message-body (cheshire/generate-string {
   :board [nil nil nil nil nil nil nil nil nil]
   :currentPlayerMark xMark
@@ -27,18 +35,22 @@
   :X human
 }))
 
-(def human-v-human-request
+(defn build-request-with-body
+  [body]
   (.. (Request$Builder.)
-      (body human-v-human-message-body)
+      (body body)
       (build)))
 
-(def human-v-ai-request
-  (.. (Request$Builder.)
-      (body human-v-ai-message-body)
-      (build)))
+(deftest generate-response-for-invalid-board-idx
+  (let [request (build-request-with-body invalid-idx-message-body)
+        response (.generateResponse move-handler request)
+        status-code (.getStatusCode response)]
+    (testing "it returns a Response with status code 400")
+      (is (= 400 status-code))))
 
 (deftest generate-response-for-human-move 
-  (let [response (.generateResponse move-handler human-v-human-request)
+  (let [request (build-request-with-body human-v-human-message-body)
+        response (.generateResponse move-handler request)
         status-code (.getStatusCode response)
         message-body (.getMessageBody response)
         response-body-json (cheshire/parse-string (String. message-body))]
@@ -49,7 +61,8 @@
                 (get response-body-json "board")))))
 
 (deftest generate-response-for-ai-move 
-  (let [response (.generateResponse move-handler human-v-ai-request)
+  (let [request (build-request-with-body human-v-ai-message-body)
+        response (.generateResponse move-handler request)
         status-code (.getStatusCode response)
         message-body (.getMessageBody response)
         response-body-json (cheshire/parse-string (String. message-body))]
