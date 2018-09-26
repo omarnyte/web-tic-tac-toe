@@ -7,14 +7,8 @@
 
 (import BadRequestException)
 
-(def missingSelectedIdxMessage "Index selection is required")
+(def missingSelectedIdxMessage "selectedIdx is required")
 (def invalidSelectedIdxMessage "Index selection is invalid")
-
-(defn- validate-selected-idx 
-  [idx]
-  (if (nil? idx) 
-      (throw (BadRequestException. missingSelectedIdxMessage))
-      (Integer/parseInt idx)))
 
 (defn- make-human-move
   [board selected-idx mark]
@@ -27,14 +21,21 @@
   (let [best-idx (ai/choose-best-space board mark)]
     (board/mark-board board best-idx mark)))
 
+(defn- validate-selected-idx 
+  [idx]
+  (if (nil? idx) 
+      (throw (BadRequestException. missingSelectedIdxMessage))
+      (Integer/parseInt idx)))
+
 (defn make-move
   [game-state]
   (let [board (get game-state :board)
-        selected-idx (validate-selected-idx (get game-state :selectedIdx))
-        current-player-mark (get game-state :currentPlayerMark)
-        is-human? (= (get game-state (keyword current-player-mark)) "human")]
+        players-state (get game-state :players)
+        current-player-mark (get players-state :currentPlayerMark)
+        is-human? (= (get players-state (keyword current-player-mark)) "human")]
     (if is-human?
-        (make-human-move board selected-idx current-player-mark)
+        (make-human-move board 
+                         (validate-selected-idx (get game-state :selectedIdx))current-player-mark)
         (make-ai-move board current-player-mark)))) 
 
 (defn update-game-over-state 

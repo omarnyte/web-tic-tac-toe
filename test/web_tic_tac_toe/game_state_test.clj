@@ -5,18 +5,17 @@
 
 (def no-idx-game-state 
   {:board ["X" nil nil nil nil nil nil nil nil]
-   :currentPlayerMark "X"
-   :O "human"
-   :X "human"})
+   :players {:currentPlayerMark "O"
+             :O "human"
+             :X "human"}})
 
 (defn create-game-state-with-idx
   [idx]
   {:board ["X" nil nil nil nil nil nil nil nil]
-  :currentPlayerMark "O"
-  :O "human"
-  :selectedIdx idx
-  :X "human"})
-
+   :players {:currentPlayerMark "O"
+             :O "human"
+             :X "human"}
+  :selectedIdx idx})
 
 (defn create-players-state-with-current-player
   [current-player-mark]
