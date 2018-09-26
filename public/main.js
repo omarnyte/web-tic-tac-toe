@@ -33,7 +33,7 @@ const updateBoard = (updatedBoard) => {
 }
 
 const getCurrentPlayerType = (currentPlayerMark) => {
-  return state[currentPlayerMark];
+  return state.players[currentPlayerMark];
 }
 
 const isHuman = (currentPlayerMark) => {
@@ -59,15 +59,16 @@ const updateDisplay = (currentPlayerMark) => {
 
 const updateState = (data) => {
   updateBoard(data.board);
-  state.currentPlayerMark = data.currentPlayerMark;
-  state.O = data.O;
-  state.X = data.X;
+  state = data;
+  state.players.currentPlayerMark = data.players.currentPlayerMark;
+  state.players.O = data.players.O;
+  state.players.X = data.players.X;
 
-  if (getCurrentPlayerType(state.currentPlayerMark) === "ai") {
+  if (getCurrentPlayerType(data.players.currentPlayerMark) === "ai") {
     aiMoveRequest();
   }
 
-  updateDisplay(data.currentPlayerMark);
+  updateDisplay(data.players.currentPlayerMark);
 }
 
 const makeRequest = (url, payload, callback) => {
