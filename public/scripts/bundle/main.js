@@ -86,6 +86,37 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./public/scripts/ai.js":
+/*!******************************!*\
+  !*** ./public/scripts/ai.js ***!
+  \******************************/
+/*! exports provided: isAi, handleAiTurn */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isAi", function() { return isAi; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "handleAiTurn", function() { return handleAiTurn; });
+/* harmony import */ var _request__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./request */ "./public/scripts/request.js");
+
+
+const isAi = (playersState) => {
+  const currentPlayerMark = playersState.currentPlayerMark;
+  return playersState[currentPlayerMark] === "ai";
+}
+
+const handleAiTurn = (state, callback) => {
+  const thinkingTime = Math.random() * 2000;
+  sleep(thinkingTime).then(() => _request__WEBPACK_IMPORTED_MODULE_0__["makeAiMoveRequest"](state, callback));
+}
+
+const sleep  = (time) => {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
+
+
+/***/ }),
+
 /***/ "./public/scripts/main.js":
 /*!********************************!*\
   !*** ./public/scripts/main.js ***!
@@ -95,12 +126,80 @@
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _request__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./request */ "./public/scripts/request.js");
+/* harmony import */ var _ai__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ai */ "./public/scripts/ai.js");
+/* harmony import */ var _request__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./request */ "./public/scripts/request.js");
+/* harmony import */ var _statusDisplay__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./statusDisplay */ "./public/scripts/statusDisplay.js");
 
 
+
+
+const buttons = document.querySelectorAll("button");
 const markedClassName = "marked";
+const spaces = document.querySelectorAll(".space");
 
 let state = {}
+
+buttons.forEach(button => {
+  const id = button.getAttribute("id");
+  button.addEventListener("click", () => handleNewGameButtonClick(id));
+});
+
+const handleNewGameButtonClick = (id) => {
+  _request__WEBPACK_IMPORTED_MODULE_1__["newGameRequest"](id, handleNewGameResponse);
+  resetSpaces();
+}
+
+const handleNewGameResponse = (response) => {
+  if (response.ok) {
+    updateGame(response);
+  } else {
+    window.alert("That game type is invalid. Please select another.");
+  }
+}
+
+const resetSpaces = () => {
+  spaces.forEach(space => {
+    space.classList.remove(markedClassName);
+    const idx = space.dataset.idx;
+    space.addEventListener("click", () => handleSpaceClick(space, idx));
+  });
+}
+
+const handleSpaceClick = (space, idx) => {
+  if (shouldMakeMove(state, space)) _request__WEBPACK_IMPORTED_MODULE_1__["makeMoveRequest"](idx, state, handleMoveResponse);
+}
+
+const shouldMakeMove = (state, space) => {
+  return !space.classList.contains(markedClassName) && !state.gameOverState.isOver && isHuman(state.players);
+}
+
+const isHuman = (playersState) => {
+  const currentPlayerMark = playersState.currentPlayerMark;
+  return playersState[currentPlayerMark] === "human";
+}
+
+const handleMoveResponse = (response) => {
+  if (response.ok) {
+    updateGame(response);
+  } else {
+    window.alert("That move is invalid. Please select another.");
+  }
+}
+
+const updateGame = async (response) => {
+  state = await response.json();
+  updateBoard(state.board);
+  _statusDisplay__WEBPACK_IMPORTED_MODULE_2__["updateStatusDisplay"](state);
+
+  if (_ai__WEBPACK_IMPORTED_MODULE_0__["isAi"](state.players)) _ai__WEBPACK_IMPORTED_MODULE_0__["handleAiTurn"](state, updateGame);
+}
+
+const updateBoard = (updatedBoard) => {
+  state.board = updatedBoard;
+  spaces.forEach((space, idx) => {
+    updateSpace(space, idx);
+  });
+}
 
 const updateClassList = (space, idx) => {
   const updatedClassList = space.classList;
@@ -113,69 +212,6 @@ const updateSpace = (space, idx) => {
   space.classList = updateClassList(space, idx);
 }
 
-const updateBoard = (updatedBoard) => {
-  state.board = updatedBoard;
-  spaces.forEach((space, idx) => {
-    updateSpace(space, idx);
-  });
-}
-
-const getCurrentPlayerType = (currentPlayerMark) => {
-  return state.players[currentPlayerMark];
-}
-
-const isHuman = (currentPlayerMark) => {
-  return state[currentPlayerMark] === "human";
-}
-
-const generateHumanTurnMessage = (currentPlayerMark) => {
-  return "It's " + currentPlayerMark + "'s turn.";
-}
-
-const generateAiTurnmessage = (currentPlayerMark) => {
-  return currentPlayerMark + " is thinking.";
-}
-
-const generateTurnDisplay = (currentPlayerMark) => {
-  return isHuman(currentPlayerMark) ? generateHumanTurnMessage(currentPlayerMark) : generateAiTurnmessage(currentPlayerMark); 
-}
-
-const updateDisplay = (currentPlayerMark) => {
-  const displayDiv = document.querySelector(".display-div");
-  displayDiv.innerText = generateTurnDisplay(currentPlayerMark);
-}
-
-const updateState = (data) => {
-  updateBoard(data.board);
-  state = data;
-  state.players.currentPlayerMark = data.players.currentPlayerMark;
-  state.players.O = data.players.O;
-  state.players.X = data.players.X;
-
-  if (getCurrentPlayerType(data.players.currentPlayerMark) === "ai") {
-    _request__WEBPACK_IMPORTED_MODULE_0__["aiMoveRequest"](state, updateState);
-  }
-
-  updateDisplay(data.players.currentPlayerMark);
-}
-
-const handleSpaceClick = (space, idx) => {
-  if (space.classList.contains(markedClassName)) return;
-  _request__WEBPACK_IMPORTED_MODULE_0__["makeMoveRequest"](idx, state, updateState);
-}
-
-const buttons = document.querySelectorAll("button");
-buttons.forEach(button => {
-  const id = button.getAttribute("id");
-  button.addEventListener("click", () => _request__WEBPACK_IMPORTED_MODULE_0__["newGameRequest"](id, state, updateState));
-});
-
-const spaces = document.querySelectorAll(".space");
-spaces.forEach(space => {
-  const idx = space.dataset.idx;
-  space.addEventListener("click", () => handleSpaceClick(space, idx));
-});
-
 
 /***/ }),
 
@@ -183,25 +219,14 @@ spaces.forEach(space => {
 /*!***********************************!*\
   !*** ./public/scripts/request.js ***!
   \***********************************/
-/*! exports provided: newGameRequest, makeMoveRequest, aiMoveRequest */
+/*! exports provided: newGameRequest, makeMoveRequest, makeAiMoveRequest */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "newGameRequest", function() { return newGameRequest; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "makeMoveRequest", function() { return makeMoveRequest; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "aiMoveRequest", function() { return aiMoveRequest; });
-const endpoints = {
-  move: "/api/move",
-  newGame: "/api/new-game",
-}
-
-const makeRequest = (url, payload, callback) => {
-  fetch(url, payload)
-    .then(response => response.json()) 
-    .then(data => callback(data));
-}
-
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "makeAiMoveRequest", function() { return makeAiMoveRequest; });
 const jsonPostPayload = {
   method: "POST",
   headers: {
@@ -209,27 +234,75 @@ const jsonPostPayload = {
   }
 }
 
-const newGameRequest = (id, state, callback) => {
-  let payload = jsonPostPayload;
-  payload.body = state;
-  payload.body.gameType = id;
-  payload.body = JSON.stringify(payload.body);
+const endpoints = {
+  move: "/api/move",
+  newGame: "/api/new-game",
+}
+
+const newGameRequest = (id, callback) => {
+  const body = JSON.stringify({gameType: id});
+  const payload = {...jsonPostPayload, body};
   makeRequest(endpoints.newGame, payload, callback);
 }
 
 const makeMoveRequest = (idx, state, callback) => {  
-  let payload = jsonPostPayload;
-  payload.body = state;
-  payload.body.selectedIdx = idx;
-  payload.body = JSON.stringify(payload.body);
-
+  const body = JSON.stringify({...state, selectedIdx: idx});  
+  const payload = {...jsonPostPayload, body}; 
   makeRequest(endpoints.move, payload, callback);
 }
 
-const aiMoveRequest = (state, callback) => {
-  let payload = jsonPostPayload;
-  payload.body = JSON.stringify(state);
+const makeAiMoveRequest = (state, callback) => {
+  const body = JSON.stringify(state);
+  const payload = {...jsonPostPayload, body};
   makeRequest(endpoints.move, payload, callback);
+}
+
+const makeRequest = (url, payload, callback) => {
+  fetch(url, payload)
+    .then(response => callback(response));
+}
+
+
+/***/ }),
+
+/***/ "./public/scripts/statusDisplay.js":
+/*!*****************************************!*\
+  !*** ./public/scripts/statusDisplay.js ***!
+  \*****************************************/
+/*! exports provided: updateStatusDisplay */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "updateStatusDisplay", function() { return updateStatusDisplay; });
+/* harmony import */ var _ai__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ai */ "./public/scripts/ai.js");
+
+
+const updateStatusDisplay = (state) => {
+  const displayDiv = document.querySelector(".display-div");
+  if (state.gameOverState.isOver) {
+    displayDiv.innerText = generateWinnerDisplayMessage(state.gameOverState);
+  } else {
+    displayDiv.innerText = generateTurnDisplay(state.players)
+  }
+}
+
+const generateWinnerDisplayMessage = (gameOverState) => {
+  const winner = gameOverState.winner;
+  return (winner === null) ? "It's a tie!" : `${winner} wins!`;
+}
+
+const generateTurnDisplay = (playersState) => {
+  let currentPlayerMark = playersState.currentPlayerMark;
+  return _ai__WEBPACK_IMPORTED_MODULE_0__["isAi"](playersState) ? generateAiTurnmessage(currentPlayerMark) : generateHumanTurnMessage(currentPlayerMark); 
+}
+
+const generateAiTurnmessage = (currentPlayerMark) => {
+  return `${currentPlayerMark} is thinking.`;
+}
+
+const generateHumanTurnMessage = (currentPlayerMark) => {
+  return `It's ${currentPlayerMark}'s turn.`;
 }
 
 
