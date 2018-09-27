@@ -1,8 +1,9 @@
-/target
-/classes
-/checkouts
+.settings 
+.vscode 
+bin 
+node_modules 
+/target 
 pom.xml
-pom.xml.asc
 *.jar
 *.class
 /.lein-*
@@ -10,3 +11,5 @@ pom.xml.asc
 .hgignore
 .hg/
 .vscode
+.settings
+.project
