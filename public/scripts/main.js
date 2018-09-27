@@ -1,21 +1,11 @@
-const endpoints = {
-  move: "/api/move",
-  newGame: "/api/new-game",
-}
+import * as request from "./request";
 
 const markedClassName = "marked";
-
-const jsonPostPayload = {
-  method: "POST",
-  headers: {
-    'Content-Type': 'application/json'
-  }
-}
 
 let state = {}
 
 const updateClassList = (space, idx) => {
-  updatedClassList = space.classList;
+  const updatedClassList = space.classList;
   if (state.board[idx] != null) updatedClassList.add(markedClassName);
   return updatedClassList
 }
@@ -65,54 +55,21 @@ const updateState = (data) => {
   state.players.X = data.players.X;
 
   if (getCurrentPlayerType(data.players.currentPlayerMark) === "ai") {
-    aiMoveRequest();
+    request.aiMoveRequest(state, updateState);
   }
 
   updateDisplay(data.players.currentPlayerMark);
 }
 
-const makeRequest = (url, payload, callback) => {
-  fetch(url, payload)
-    .then(response => response.json()) 
-    .then(data => callback(data));
-}
-
-const newGameRequest = (id) => {
-  let payload = jsonPostPayload;
-  payload.body = state;
-  payload.body.gameType = id;
-  payload.body = JSON.stringify(payload.body);
-  makeRequest(endpoints.newGame, payload, updateState);
-}
-
-const makeMoveRequest = (idx) => {  
-  let payload = jsonPostPayload;
-  payload.body = state;
-  payload.body.selectedIdx = idx;
-  payload.body = JSON.stringify(payload.body);
-
-  makeRequest(endpoints.move, payload, updateState);
-}
-
 const handleSpaceClick = (space, idx) => {
   if (space.classList.contains(markedClassName)) return;
-  makeMoveRequest(idx);
-}
-
-const aiMoveRequest = () => {
-  let payload = jsonPostPayload;
-  payload.body = JSON.stringify(state);
-  makeRequest(endpoints.move, payload, updateState);
-}
-
-const switchCurrentPlayer = (currentPlayerMark) => {
-  return currentPlayerMark === "X" ? "O" : "X";
+  request.makeMoveRequest(idx, state, updateState);
 }
 
 const buttons = document.querySelectorAll("button");
 buttons.forEach(button => {
   const id = button.getAttribute("id");
-  button.addEventListener("click", () => newGameRequest(id));
+  button.addEventListener("click", () => request.newGameRequest(id, state, updateState));
 });
 
 const spaces = document.querySelectorAll(".space");
