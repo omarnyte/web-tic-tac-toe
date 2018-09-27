@@ -3,7 +3,8 @@
   :url "https://github.com/omarnyte/Web-Tic-Tac-Toe"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[info.cukes/cucumber-java "1.2.4"]
+  :dependencies [[cheshire "5.8.0"]
+                 [info.cukes/cucumber-java "1.2.4"]
                  [info.cukes/cucumber-junit "1.2.4"]
                  [junit/junit "4.12"]
                  [org.json/json "20180813"]

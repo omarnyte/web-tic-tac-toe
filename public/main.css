@@ -1,0 +1,46 @@
+.board {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.buttons {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.row {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.row.middle {
+  border-bottom: 2px solid black;
+}
+
+.space {
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  vertical-align: middle;
+  width: 50px;
+}
+
+.space.middle {
+  border-left: 2px solid black;
+  border-right: 2px solid black;
+}
+
+.top {
+  border-bottom: 2px solid black;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
