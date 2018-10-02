@@ -2,7 +2,8 @@
   (:require [clojure.test :refer :all]
             [web-tic-tac-toe.middleware :refer :all]))
 
-(import HttpStatusCode Middleware Response)
+(import (com.omarnyte.middleware Middleware) 
+        (com.omarnyte.response HttpStatusCode Response$Builder))
 
 (def message-body "Hello, world!")
 

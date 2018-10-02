@@ -3,7 +3,7 @@
             [cheshire.core :as cheshire]
             [web-tic-tac-toe.new-game-handler :refer :all]))
 
-(import Request)
+(import (com.omarnyte.request Request Request$Builder))
 
 (def new-game-handler (reify-handler))
 

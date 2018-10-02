@@ -5,7 +5,9 @@
             [web-tic-tac-toe.middleware :as middleware])
   (:gen-class))
 
-(import Directory Middleware Router Server)
+(import (com.omarnyte Directory Router Server)
+        (com.omarnyte.logger Logger)
+        (com.omarnyte.middleware Middleware))
 
 (def default-port 8888)
 (def path (str (System/getProperty "user.dir") "/public"))

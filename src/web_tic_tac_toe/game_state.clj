@@ -5,7 +5,7 @@
             [tic-tac-clojure.game-logic :as game-logic]
             [tic-tac-clojure.player :as player]))
 
-(import BadRequestException)
+(import (com.omarnyte.exception BadRequestException))
 
 (def missingSelectedIdxMessage "selectedIdx is required")
 (def invalidSelectedIdxMessage "Index selection is invalid")

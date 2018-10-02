@@ -3,6 +3,8 @@
             [tic-tac-clojure.sample-boards :as sample-boards]
             [web-tic-tac-toe.game-state :refer :all]))
 
+(import (com.omarnyte.exception BadRequestException))
+          
 (def no-idx-game-state 
   {:board ["X" nil nil nil nil nil nil nil nil]
    :players {:currentPlayerMark "O"

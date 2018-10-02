@@ -4,7 +4,9 @@
             [clojure.string :as str]
             [tic-tac-clojure.board :as board]))
 
-(import Handler Response)
+(import (com.omarnyte.handler Handler)
+        (com.omarnyte.http MessageHeader) 
+        (com.omarnyte.response HttpStatusCode Response Response$Builder))
 
 (def first-player-mark "X")
 (def game-type-separator #"\-v\-")

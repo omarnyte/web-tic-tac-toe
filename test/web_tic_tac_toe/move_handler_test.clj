@@ -3,7 +3,9 @@
             [clojure.test :refer :all]
             [tic-tac-clojure.sample-boards :as sample-boards]
             [web-tic-tac-toe.move-handler :refer :all]))
-     
+
+(import (com.omarnyte.request Request$Builder))            
+
 (def board [nil nil nil nil nil nil nil nil nil])
           
 (def move-handler (reify-handler))
