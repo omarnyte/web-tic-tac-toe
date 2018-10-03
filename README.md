@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/omarnyte/web-tic-tac-toe.svg?branch=master)](https://travis-ci.org/omarnyte/web-tic-tac-toe)
+
 # Web Tic Tac Toe
 This web version of Tic Tac Toe is served on a [custom HTTP Server](https://github.com/omarnyte/http-server). Players can choose one of four game types against, including against an unbeatable computer. 
 
