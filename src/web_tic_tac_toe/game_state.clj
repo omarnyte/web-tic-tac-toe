@@ -7,6 +7,7 @@
 
 (import (com.omarnyte.exception BadRequestException))
 
+(def missingPlayersMessage "players key is required")
 (def missingSelectedIdxMessage "selectedIdx is required")
 (def invalidSelectedIdxMessage "Index selection is invalid")
 
@@ -50,7 +51,9 @@
 
 (defn update-players-state
   [players-state]
-  (let [current-player-mark (get players-state :currentPlayerMark)]
-    (assoc players-state 
-           :currentPlayerMark 
-           (get-opp-mark current-player-mark))))
+  (if (nil? players-state)
+      (throw (BadRequestException. missingPlayersMessage))
+      (let [current-player-mark (get players-state :currentPlayerMark)]
+        (assoc players-state 
+               :currentPlayerMark 
+               (get-opp-mark current-player-mark)))))
