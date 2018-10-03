@@ -39,8 +39,9 @@
         message-body (.getMessageBody response)
         response-body-json (cheshire/parse-string (String. message-body))
         board (get response-body-json "board")
-        xPlayer (get response-body-json xMark)
-        oPlayer (get response-body-json oMark)]
+        players-state (get response-body-json "players")
+        xPlayer (get players-state xMark)
+        oPlayer (get players-state oMark)]
     (testing "it returns a Response with status code 200")
       (is (= 200 status-code))
     (testing "it returns a Response containing an empty board")
@@ -56,15 +57,16 @@
         message-body (.getMessageBody response)
         response-body-json (cheshire/parse-string (String. message-body))
         board (get response-body-json "board")
-        xPlayer (get response-body-json xMark)
-        oPlayer (get response-body-json oMark)]
+        players-state (get response-body-json "players")
+        xPlayer (get players-state xMark)
+        oPlayer (get players-state oMark)]
     (testing "it returns a Response with status code 200")
       (is (= 200 status-code))
     (testing "it returns a Response containing an empty board")
         (is (= (vec (repeat board-length nil)) board))
     (testing "it returns a Response containing a human and AI player")
         (is (and (= human xPlayer)
-                  (= ai oPlayer)))))
+                 (= ai oPlayer)))))
               
 (deftest generate-response-for-ai-v-ai 
   (let [request (build-request "ai-v-ai")
@@ -73,8 +75,9 @@
         message-body (.getMessageBody response)
         response-body-json (cheshire/parse-string (String. message-body))
         board (get response-body-json "board")
-        xPlayer (get response-body-json xMark)
-        oPlayer (get response-body-json oMark)]
+        players-state (get response-body-json "players")
+        xPlayer (get players-state xMark)
+        oPlayer (get players-state oMark)]
     (testing "it returns a Response with status code 200")
       (is (= 200 status-code))
     (testing "it returns a Response containing an empty board")

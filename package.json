@@ -1,0 +1,30 @@
+{
+  "name": "web-tic-tac-toe",
+  "version": "1.0.0",
+  "description": "This web version of Tic Tac Toe is currently under construction.",
+  "main": "public/main.js",
+  "directories": {
+    "doc": "doc",
+    "test": "test"
+  },
+  "scripts": {
+    "build": "webpack",
+    "dev": "webpack --mode development --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omarnyte/web-tic-tac-toe.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/omarnyte/web-tic-tac-toe/issues"
+  },
+  "homepage": "https://github.com/omarnyte/web-tic-tac-toe#readme",
+  "devDependencies": {
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.1"
+  }
+}

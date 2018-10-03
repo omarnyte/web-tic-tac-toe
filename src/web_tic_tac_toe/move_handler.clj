@@ -1,63 +1,40 @@
 (ns web-tic-tac-toe.move-handler
   (:gen-class)
   (:require [cheshire.core :as cheshire]
-            [tic-tac-clojure.board :as board]
-            [tic-tac-clojure.gameplay :as gameplay]
-            [tic-tac-clojure.player :as player]))
+            [web-tic-tac-toe.game-state :as game-state]))
 
-(import Handler Response)
-          
-(defn- make-human-move
-  [request-json]
-  (board/mark-board (get request-json "board")
-                    (read-string (get request-json "selectedIdx"))
-                    (get request-json "currentPlayerMark")))
+(import Handler MessageHeader Response)
 
-(defn- make-ai-move 
-  [request-json]
-  (let [current-player-mark (get request-json "currentPlayerMark")
-        ai-player (player/create-proto-player current-player-mark "ai")
-        board (get request-json "board")]
-    (player/take-turn ai-player board)))
+(def get-keywords-back true)
 
-(defn- make-move 
-  [request-json]
-  (let [current-player-mark (get request-json "currentPlayerMark")
-        is-human (= (get request-json current-player-mark) "human")]
-    (if is-human (make-human-move request-json) 
-                 (make-ai-move request-json))))
+(defn- build-bad-request-response
+  [e]
+  (.. (Response$Builder. HttpStatusCode/BAD_REQUEST)
+      (messageBody (.getMessage e))
+      (build)))
 
-(defn- get-opp-mark
-[marker]
-(if (= "X" marker) "O" "X"))
+(defn- build-message-body
+  [game-state]
+  (let [updated-board (game-state/make-move game-state)]
+  (cheshire/generate-string {
+    :board updated-board
+    :gameOverState (game-state/update-game-over-state updated-board)
+    :players (game-state/update-players-state (get game-state :players))
+  })))
 
-(defn- create-message-body
-  [request]
-  (let [request-json (cheshire/parse-string (.getBody request))]
-    (cheshire/generate-string {
-      :board (make-move request-json)
-      :currentPlayerMark (get-opp-mark (get request-json "currentPlayerMark"))
-      :X (get request-json "X")
-      :O (get request-json "O")
-    })))
-          
-(defn- build-move-response
-  [request]
+(defn- build-response-with-updated-game-state
+  [game-state]
   (.. (Response$Builder. HttpStatusCode/OK)
       (setHeader (MessageHeader/CONTENT_TYPE) "application/json")
-      (messageBody (create-message-body request))
+      (messageBody (build-message-body game-state))
       (build)))
-  
-(defn- build-bad-request-response
-  []
-  (.. (Response$Builder. HttpStatusCode/BAD_REQUEST)
-      (build)))
-        
+
 (defn- generate-response
   [request]
-  (try (build-move-response request)
-       (catch NullPointerException e (build-bad-request-response))
-       (catch IndexOutOfBoundsException e (build-bad-request-response))))
+  (let [body (.getBody request)
+        request-body-json (cheshire/parse-string body get-keywords-back)]
+      (try (build-response-with-updated-game-state request-body-json)
+           (catch BadRequestException e (build-bad-request-response e)))))
 
 (defn reify-handler 
   []

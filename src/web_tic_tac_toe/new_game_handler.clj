@@ -8,13 +8,22 @@
 
 (def first-player-mark "X")
 (def game-type-separator #"\-v\-")
+(def initialGameOverState {:isOver false 
+                    :isTie false 
+                    :winner nil})
 (def oIndex 1)
 (def xIndex 0)
 
 (defn- set-player 
   [gameType, idx]
   (nth (str/split gameType game-type-separator) idx))
-
+                                                            
+(defn- set-initial-players-state
+  [game-type]
+  {:currentPlayerMark first-player-mark
+   :X (set-player game-type xIndex)
+   :O (set-player game-type oIndex)})
+                                                            
 (defn- create-message-body
   [request]
   (let [board-length 9
@@ -22,11 +31,9 @@
         game-type (get request-json "gameType")]
     (cheshire/generate-string {
       :board (board/generate-empty-board board-length)
-      :currentPlayerMark first-player-mark
-      :X (set-player game-type xIndex)
-      :O (set-player game-type oIndex)
-    })))
-  
+      :gameOverState initialGameOverState
+      :players (set-initial-players-state game-type)})))
+
 (defn- build-new-game-response
   [request]
   (.. (Response$Builder. HttpStatusCode/OK)
