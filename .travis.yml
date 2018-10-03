@@ -1,0 +1,6 @@
+language: clojure
+
+dist: trusty 
+sudo: false 
+
+jdk: oraclejdk10
