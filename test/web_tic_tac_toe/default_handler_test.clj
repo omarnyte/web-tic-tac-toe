@@ -2,7 +2,10 @@
   (:require [clojure.test :refer :all]
             [web-tic-tac-toe.default-handler :refer :all]))
 
-(import HttpStatusCode MessageHeader)
+(import (com.omarnyte Directory) 
+        (com.omarnyte.http MessageHeader) 
+        (com.omarnyte.request Request$Builder)
+        (com.omarnyte.response HttpStatusCode))
 
 (def sample-request
      (.. (Request$Builder.)

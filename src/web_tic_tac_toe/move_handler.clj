@@ -3,7 +3,10 @@
   (:require [cheshire.core :as cheshire]
             [web-tic-tac-toe.game-state :as game-state]))
 
-(import Handler MessageHeader Response)
+(import (com.omarnyte.exception BadRequestException)
+        (com.omarnyte.handler Handler)
+        (com.omarnyte.http MessageHeader)
+        (com.omarnyte.response HttpStatusCode Response$Builder))
 
 (def get-keywords-back true)
 

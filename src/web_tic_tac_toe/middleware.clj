@@ -1,7 +1,7 @@
 (ns web-tic-tac-toe.middleware
   (:gen-class))
 
-(import Middleware)
+(import (com.omarnyte.middleware Middleware))
 
 (defn- apply-middleware
   [response]

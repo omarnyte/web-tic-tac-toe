@@ -1,7 +1,9 @@
 (ns web-tic-tac-toe.default-handler
   (:gen-class))
 
-(import Handler HttpStatusCode MessageHeader)
+(import (com.omarnyte.handler Handler) 
+        (com.omarnyte.http MessageHeader)
+        (com.omarnyte.response HttpStatusCode Response$Builder))
 
 (defn- build-response
   [directory]
