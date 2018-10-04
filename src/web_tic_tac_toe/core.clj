@@ -5,10 +5,12 @@
             [web-tic-tac-toe.middleware :as middleware])
   (:gen-class))
 
-(import (com.omarnyte Directory Router Server)
+(import (java.io File)
+        (com.omarnyte Directory Router Server)
         (com.omarnyte.logger Logger)
         (com.omarnyte.middleware Middleware))
 
+(def env-port (System/getenv "PORT"))
 (def default-port 8888)
 (def path (str (System/getProperty "user.dir") "/public"))
 (def logger-path (str (System/getProperty "user.dir") "/logs"))
@@ -30,15 +32,26 @@
            (get-routes) 
            (get-directory)))
 
+(defn- create-log-directory
+  [logger-path]
+  (let [log-diretory (File. logger-path)]
+    (.mkdirs log-diretory)))
+
 (defn set-up-logger-middleware
   []
   (let [logger (Logger. logger-path "yyyymmddhhmmss")]
+    (create-log-directory logger-path)
     (.createLogFile logger)
     logger))
-          
+
+(defn- get-port-from-env
+  [env-port]
+  (try (Integer/parseInt env-port)
+       (catch NumberFormatException e nil)))
+
 (defn configure-server
   []
-  (Server. default-port 
+  (Server. (or (get-port-from-env env-port) default-port) 
            (set-up-router) 
            (set-up-logger-middleware)))
 
