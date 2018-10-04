@@ -1,0 +1,24 @@
+{
+  "name": "web-tic-tac-toe",
+  "description": "A online Tic Tac Toe game written in Clojure and served from a custom Java HTTP Server.",
+  "scripts": {
+  },
+  "env": {
+  },
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "addons": [
+
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "heroku/clojure"
+    }
+  ]
+}
