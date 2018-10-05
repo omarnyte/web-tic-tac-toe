@@ -9,6 +9,7 @@
   },
   "scripts": {
     "build": "webpack",
+    "cypress:open": "cypress open",
     "dev": "webpack --mode development --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -24,6 +25,7 @@
   },
   "homepage": "https://github.com/omarnyte/web-tic-tac-toe#readme",
   "devDependencies": {
+    "cypress": "^3.1.0",
     "webpack": "^4.20.2",
     "webpack-cli": "^3.1.1"
   }
