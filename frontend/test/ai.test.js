@@ -1,4 +1,4 @@
-import * as ai from '../public/scripts/ai';
+import * as ai from '../../public/scripts/ai';
 
 const chai = require('chai');
 const assert = chai.assert;
@@ -6,7 +6,7 @@ const assert = chai.assert;
 describe('testing ai.js', function() {
   context('isAI', function() {
     it('return true when current player is AI', function() {
-      const playersState = { 
+      const playersState = {
         "currentPlayerMark": "O",
         "O": "ai",
         "X": "human"
@@ -15,5 +15,5 @@ describe('testing ai.js', function() {
       assert.true(ai.isAi(playersState));
     });
   });
-  
+
 });
