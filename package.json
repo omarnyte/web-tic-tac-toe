@@ -11,7 +11,7 @@
     "cypress:open": "cypress open",
     "dev": "webpack --mode development --watch",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test:unit": "mocha 'frontend/test'"
+    "test:unit": "mocha 'frontend/test' --require babel-register  --require babel-polyfill" 
   },
   "repository": {
     "type": "git",
@@ -25,7 +25,12 @@
   },
   "homepage": "https://github.com/omarnyte/web-tic-tac-toe#readme",
   "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-register": "^6.26.0",
     "chai": "^4.2.0",
+    "coffeescript": "^2.3.2",
     "cypress": "^3.1.0",
     "mocha": "^5.2.0",
     "webpack": "^4.20.2",
